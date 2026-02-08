@@ -1,0 +1,1808 @@
+<!doctype html>
+<html lang="th" class="h-full">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบจัดเก็บเอกสารราชการ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      box-sizing: border-box;
+      font-family: 'Kanit', sans-serif;
+    }
+
+    * {
+      font-family: 'Kanit', sans-serif;
+    }
+
+    .gradient-1 {
+      background: linear-gradient(135deg, #26A69A 0%, #4DB6AC 100%);
+    }
+
+    .gradient-2 {
+      background: linear-gradient(135deg, #66BB6A 0%, #81C784 100%);
+    }
+
+    .gradient-3 {
+      background: linear-gradient(135deg, #FFA726 0%, #FFB74D 100%);
+    }
+
+    .gradient-4 {
+      background: linear-gradient(135deg, #EF5350 0%, #E57373 100%);
+    }
+
+    .gradient-5 {
+      background: linear-gradient(135deg, #AB47BC 0%, #BA68C8 100%);
+    }
+
+    .gradient-6 {
+      background: linear-gradient(135deg, #4A2C6D 0%, #7B1FA2 100%);
+    }
+
+    .gradient-7 {
+      background: linear-gradient(135deg, #1E88E5 0%, #42A5F5 100%);
+    }
+
+    .card-decoration {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-decoration::after {
+      content: '';
+      position: absolute;
+      top: -20px;
+      right: -20px;
+      width: 100px;
+      height: 100px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .login-bg {
+      background: linear-gradient(135deg, #4A2C6D 0%, #26A69A 50%, #AED581 100%);
+      position: relative;
+    }
+
+    .login-bg::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image:
+        radial-gradient(circle at 20% 80%, rgba(255, 202, 40, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(38, 166, 154, 0.3) 0%, transparent 50%);
+      animation: pulse-bg 10s infinite alternate;
+    }
+
+    @keyframes pulse-bg {
+      0% {
+        opacity: 0.5;
+        transform: scale(1);
+      }
+
+      100% {
+        opacity: 1;
+        transform: scale(1.1);
+      }
+    }
+
+    .bg-decoration-blob {
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: linear-gradient(135deg, rgba(38, 166, 154, 0.2) 0%, rgba(74, 44, 109, 0.2) 100%);
+      filter: blur(80px);
+      border-radius: 50%;
+      z-index: 1;
+      animation: float-blob 20s infinite alternate;
+    }
+
+    @keyframes float-blob {
+      0% {
+        transform: translate(-10%, -10%) rotate(0deg);
+      }
+
+      100% {
+        transform: translate(10%, 10%) rotate(360deg);
+      }
+    }
+
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .sidebar-transition {
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .modal-overlay {
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+    }
+
+     .loader {
+          width: 200px;
+          height: 140px;
+          background: #979794;
+          box-sizing: border-box;
+          position: relative;
+          border-radius:8px;
+          perspective: 1000px;
+        }
+
+        .loader:before{
+          content: '';
+          position: absolute;
+          left: 10px;
+          right: 10px;
+          top: 10px;
+          bottom: 10px;
+          border-radius:8px;
+          background: #f5f5f5  no-repeat;
+          background-size: 60px 10px;
+          background-image: 	linear-gradient(#ddd 100px, transparent 0) ,
+                    linear-gradient(#ddd 100px, transparent 0), 
+                    linear-gradient(#ddd 100px, transparent 0), 
+                    linear-gradient(#ddd 100px, transparent 0), 
+                    linear-gradient(#ddd 100px, transparent 0), 
+                    linear-gradient(#ddd 100px, transparent 0);
+          
+          background-position: 15px 30px , 15px 60px , 15px 90px, 
+                    105px 30px , 105px 60px , 105px 90px;
+          box-shadow: 0 0 10px rgba(0,0,0,0.25);
+        }
+        .loader:after {
+          content: '';
+            position: absolute;
+            width: calc(50% - 10px);
+            right: 10px;
+            top: 10px;
+            bottom: 10px;
+            border-radius: 8px;
+            background: #fff no-repeat;
+            background-size: 60px 10px;
+            background-image: linear-gradient(#ddd 100px, transparent 0), 
+                    linear-gradient(#ddd 100px, transparent 0), 
+                    linear-gradient(#ddd 100px, transparent 0);
+            background-position: 50% 30px ,50% 60px , 50%  90px;
+            transform: rotateY(0deg );
+            transform-origin: left center;
+          animation: paging 1s linear infinite;
+        }
+
+
+        @keyframes paging {
+          to {
+            transform: rotateY( -180deg );
+          }
+        }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    .progress-bar {
+      transition: width 0.5s ease-in-out;
+    }
+
+    .sweet-alert {
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes popIn {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .file-drop-zone {
+      border: 2px dashed #26A69A;
+      transition: all 0.3s ease;
+    }
+
+    .file-drop-zone.dragover {
+      background: rgba(38, 166, 154, 0.1);
+      border-color: #4A2C6D;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #aaa;
+    }
+
+    /* Form input focus transition */
+    input,
+    select,
+    textarea {
+      transition: all 0.3s ease;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+  </style>
+  <style>
+    @view-transition {
+      navigation: auto;
+    }
+  </style>
+</head>
+
+<body class="h-full bg-gray-100">
+  <div id="app" class="h-full"></div>
+  <script>
+    // ==================== State Management ====================
+    let currentUser = null;
+    let currentPage = 'login';
+    let currentMenu = 'dashboard';
+    let sidebarOpen = false;
+    let loading = false;
+
+    // Global Data Cache
+    let cachedUsers = [];
+    let cachedCategories = [];
+    let cachedDocuments = [];
+
+    // ==================== Initialization ====================
+    // Load initial data from server
+    function initApp() {
+      // Render initial state (Login page background) immediately 
+      // so the loading overlay appears on top of a beautiful UI
+      render();
+      loadDataFromServer();
+    }
+
+    // Helper to wrap google.script.run in a Promise
+    function runServerFunction(functionName, ...args) {
+      return new Promise((resolve, reject) => {
+        google.script.run
+          .withSuccessHandler(resolve)
+          .withFailureHandler(reject)[functionName](...args);
+      });
+    }
+
+    async function loadDataFromServer() {
+      showLoading();
+      try {
+        // Fetch all initial data in parallel
+        const [users, cats, docs] = await Promise.all([
+          runServerFunction('getUsers'),
+          runServerFunction('getCategories'),
+          runServerFunction('getDocuments')
+        ]);
+
+        cachedUsers = users;
+        cachedCategories = cats;
+        cachedDocuments = docs;
+
+        hideLoading();
+        render();
+      } catch (err) {
+        handleError(err);
+      }
+    }
+
+    function handleError(err) {
+      hideLoading();
+      showAlert('error', 'ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้: ' + err.message);
+    }
+
+    // ==================== Data Accessors ====================
+    function getUsers() {
+      return cachedUsers;
+    }
+
+    function getCategories() {
+      return cachedCategories;
+    }
+
+    function getDocuments() {
+      return cachedDocuments;
+    }
+
+    function generateId() {
+      // Server generates ID, but we might need temp ID or just let server handle it
+      return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    }
+
+    // ==================== Alert Functions ====================
+    function showAlert(type, title, message, callback) {
+      const alertDiv = document.createElement('div');
+      alertDiv.className = 'fixed inset-0 z-50 flex items-center justify-center modal-overlay';
+
+      const icons = {
+        success: '✅',
+        error: '❌',
+        warning: '⚠️',
+        info: 'ℹ️'
+      };
+
+      const colors = {
+        success: 'bg-green-500',
+        error: 'bg-red-500',
+        warning: 'bg-yellow-500',
+        info: 'bg-blue-500'
+      };
+
+      alertDiv.innerHTML = `
+        <div class="sweet-alert bg-white rounded-2xl shadow-2xl p-8 max-w-sm mx-4 text-center">
+          <div class="text-6xl mb-4">${icons[type]}</div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">${title}</h3>
+          <p class="text-gray-600 mb-6">${message}</p>
+          <button onclick="this.closest('.fixed').remove(); ${callback ? callback + '()' : ''}" 
+            class="${colors[type]} text-white px-8 py-3 rounded-xl font-medium hover:opacity-90 transition">
+            ตกลง
+          </button>
+        </div>
+      `;
+      document.body.appendChild(alertDiv);
+    }
+
+    function showConfirm(title, message, onConfirm) {
+      const confirmDiv = document.createElement('div');
+      confirmDiv.className = 'fixed inset-0 z-50 flex items-center justify-center modal-overlay';
+      confirmDiv.id = 'confirmDialog';
+
+      confirmDiv.innerHTML = `
+        <div class="sweet-alert bg-white rounded-2xl shadow-2xl p-8 max-w-sm mx-4 text-center">
+          <div class="text-6xl mb-4">🗑️</div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">${title}</h3>
+          <p class="text-gray-600 mb-6">${message}</p>
+          <div class="flex gap-3 justify-center">
+            <button id="confirmCancel" class="bg-gray-300 text-gray-700 px-6 py-3 rounded-xl font-medium hover:bg-gray-400 transition">
+              ยกเลิก
+            </button>
+            <button id="confirmOk" class="bg-red-500 text-white px-6 py-3 rounded-xl font-medium hover:bg-red-600 transition">
+              ยืนยันลบ
+            </button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(confirmDiv);
+
+      document.getElementById('confirmCancel').onclick = () => confirmDiv.remove();
+      document.getElementById('confirmOk').onclick = () => {
+        confirmDiv.remove();
+        onConfirm();
+      };
+    }
+
+    function showLoading() {
+      const loadingDiv = document.createElement('div');
+      loadingDiv.className = 'fixed inset-0 z-50 flex items-center justify-center modal-overlay';
+      loadingDiv.id = 'loadingOverlay';
+      loadingDiv.innerHTML = `
+        <div class="flex flex-col items-center">
+          <div class="loader"></div>
+        </div>
+      `;
+      document.body.appendChild(loadingDiv);
+    }
+
+    function hideLoading() {
+      const loadingDiv = document.getElementById('loadingOverlay');
+      if (loadingDiv) loadingDiv.remove();
+    }
+
+    // ==================== Render Functions ====================
+    function render() {
+      const app = document.getElementById('app');
+
+      if (currentPage === 'login') {
+        renderLogin();
+      } else if (currentPage === 'admin') {
+        renderAdminPanel();
+      } else if (currentPage === 'teacher') {
+        renderTeacherPanel();
+      }
+
+      // Post-render effects
+      if ((currentPage === 'admin' || currentPage === 'teacher') && currentMenu === 'dashboard') {
+        // Small timeout to ensure DOM is ready
+        setTimeout(initDashboardChart, 50);
+      }
+    }
+
+    let dashboardChart = null;
+
+    function initDashboardChart() {
+      const ctx = document.getElementById('chartCanvas');
+      if (!ctx) return;
+
+      const documents = getDocuments();
+      const categories = getCategories();
+
+      // Prepare data
+      const labels = categories.map(c => c.name);
+      const data = categories.map(c => documents.filter(d => d.categoryId === c.id).length);
+
+      // Colors matching dashboard cards
+      const bgColors = [
+        '#26A69A', // gradient-1
+        '#66BB6A', // gradient-2
+        '#FFA726', // gradient-3
+        '#EF5350', // gradient-4
+        '#AB47BC', // gradient-5
+        '#1E88E5'  // gradient-7
+      ];
+
+      if (dashboardChart) {
+        dashboardChart.destroy();
+      }
+
+      dashboardChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: data,
+            backgroundColor: bgColors,
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: {
+                font: {
+                  family: 'Kanit'
+                }
+              }
+            }
+          },
+          cutout: '70%'
+        }
+      });
+    }
+
+    function renderLogin() {
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="login-bg h-full flex items-center justify-center p-4 overflow-hidden">
+          <!-- Background Decorations -->
+          <div class="bg-decoration-blob" style="top: -100px; left: -100px;"></div>
+          <div class="bg-decoration-blob" style="bottom: -100px; right: -100px; animation-delay: -5s;"></div>
+          
+          <div class="relative z-10 bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-8 w-full max-w-md border border-white/20">
+            <div class="text-center mb-8">
+              <div class="text-6xl mb-4 drop-shadow-lg">📋</div>
+              <h1 class="text-2xl font-bold text-gray-800">ระบบจัดเก็บเอกสารราชการ</h1>
+              <p class="text-gray-500 mt-2">Government Document Management System</p>
+            </div>
+            
+            <form id="loginForm" class="space-y-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">👤 ชื่อผู้ใช้</label>
+                <input type="text" id="username" placeholder="กรอกชื่อผู้ใช้"
+                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#26A69A] focus:outline-none transition bg-gray-50 focus:bg-white">
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">🔒 รหัสผ่าน</label>
+                <div class="relative">
+                  <input type="password" id="password" placeholder="กรอกรหัสผ่าน"
+                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#26A69A] focus:outline-none transition bg-gray-50 focus:bg-white pr-12">
+                  <button type="button" onclick="togglePasswordVisibility()" 
+                    class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#26A69A] transition text-xl p-1">
+                    <span id="passwordToggleIcon">👁️</span>
+                  </button>
+                </div>
+              </div>
+              
+              <button type="submit" 
+                class="w-full gradient-1 text-white py-4 rounded-xl font-semibold text-lg hover:opacity-90 shadow-lg hover:shadow-[#26A69A]/30 transition flex items-center justify-center gap-2 active:scale-[0.98]">
+                <span>เข้าสู่ระบบ</span>
+                <span>🚀</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('loginForm').onsubmit = (e) => {
+        e.preventDefault();
+        handleLogin();
+      };
+    }
+
+    function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('password');
+      const icon = document.getElementById('passwordToggleIcon');
+
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.innerText = '🙈';
+      } else {
+        passwordInput.type = 'password';
+        icon.innerText = '👁️';
+      }
+    }
+
+    function handleLogin() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      if (!username || !password) {
+        showAlert('warning', 'กรุณากรอกข้อมูล', 'กรุณากรอกชื่อผู้ใช้และรหัสผ่าน');
+        return;
+      }
+
+      showLoading();
+
+      setTimeout(() => {
+        const users = getUsers();
+        const user = users.find(u => String(u.username) === String(username) && String(u.password) === String(password));
+
+        hideLoading();
+
+        if (user) {
+          currentUser = user;
+          currentPage = user.role === 'admin' ? 'admin' : 'teacher';
+          currentMenu = 'dashboard';
+          showAlert('success', 'เข้าสู่ระบบสำเร็จ', `ยินดีต้อนรับ ${user.fullName}`);
+          setTimeout(render, 500);
+        } else {
+          showAlert('error', 'เข้าสู่ระบบไม่สำเร็จ', 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
+        }
+      }, 800);
+    }
+
+    // ==================== Admin Panel ====================
+    function renderAdminPanel() {
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="h-full flex">
+          <!-- Sidebar Overlay for Mobile -->
+          <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 lg:hidden ${sidebarOpen ? '' : 'hidden'}" onclick="toggleSidebar()"></div>
+          
+          <!-- Sidebar -->
+          <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-50 w-72 gradient-6 text-white sidebar-transition ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0">
+            <div class="p-6">
+              <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center gap-3">
+                  <span class="text-4xl">📋</span>
+                  <div>
+                    <h2 class="font-bold text-lg">ระบบจัดเก็บเอกสาร</h2>
+                    <span class="text-xs text-white/70">Admin Panel</span>
+                  </div>
+                </div>
+                <button onclick="toggleSidebar()" class="lg:hidden text-2xl">✕</button>
+              </div>
+              
+              <div class="bg-white/10 rounded-xl p-4 mb-6">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-full gradient-1 flex items-center justify-center text-xl">
+                    👨‍💼
+                  </div>
+                  <div>
+                    <p class="font-medium">${currentUser.fullName}</p>
+                    <span class="text-xs bg-white/20 px-2 py-1 rounded-full">ผู้ดูแลระบบ</span>
+                  </div>
+                </div>
+              </div>
+              
+              <nav class="space-y-2">
+                <button onclick="setMenu('dashboard')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${currentMenu === 'dashboard' ? 'bg-white/20' : 'hover:bg-white/10'}">
+                  <span class="text-xl">📊</span>
+                  <span>แดชบอร์ด</span>
+                </button>
+                <button onclick="setMenu('users')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${currentMenu === 'users' ? 'bg-white/20' : 'hover:bg-white/10'}">
+                  <span class="text-xl">👥</span>
+                  <span>จัดการผู้ใช้งาน</span>
+                </button>
+                <button onclick="setMenu('categories')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${currentMenu === 'categories' ? 'bg-white/20' : 'hover:bg-white/10'}">
+                  <span class="text-xl">📁</span>
+                  <span>จัดการประเภทเอกสาร</span>
+                </button>
+                <button onclick="setMenu('documents')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${currentMenu === 'documents' ? 'bg-white/20' : 'hover:bg-white/10'}">
+                  <span class="text-xl">📄</span>
+                  <span>จัดการเอกสาร</span>
+                </button>
+              </nav>
+              
+              <button onclick="logout()" class="w-full mt-8 flex items-center gap-3 px-4 py-3 rounded-xl bg-red-500/80 hover:bg-red-500 transition">
+                <span class="text-xl">🚪</span>
+                <span>ออกจากระบบ</span>
+              </button>
+            </div>
+          </aside>
+          
+          <!-- Main Content -->
+          <main class="flex-1 overflow-auto">
+            <header class="bg-white shadow-sm p-4 flex items-center justify-between sticky top-0 z-30">
+              <button onclick="toggleSidebar()" class="lg:hidden text-2xl text-gray-600">☰</button>
+              <h1 class="text-xl font-bold text-gray-800">
+                ${currentMenu === 'dashboard' ? '📊 แดชบอร์ด' :
+          currentMenu === 'users' ? '👥 จัดการผู้ใช้งาน' :
+            currentMenu === 'categories' ? '📁 จัดการประเภทเอกสาร' : '📄 จัดการเอกสาร'}
+              </h1>
+              <div class="text-sm text-gray-500">${new Date().toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+            </header>
+            
+            <div id="mainContent" class="p-6">
+              ${renderContent()}
+            </div>
+          </main>
+        </div>
+      `;
+    }
+
+    // ==================== Teacher Panel ====================
+    function renderTeacherPanel() {
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="h-full flex">
+          <!-- Sidebar Overlay for Mobile -->
+          <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 lg:hidden ${sidebarOpen ? '' : 'hidden'}" onclick="toggleSidebar()"></div>
+          
+          <!-- Sidebar -->
+          <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-50 w-72 gradient-7 text-white sidebar-transition ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0">
+            <div class="p-6">
+              <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center gap-3">
+                  <span class="text-4xl">📋</span>
+                  <div>
+                    <h2 class="font-bold text-lg">ระบบจัดเก็บเอกสาร</h2>
+                    <span class="text-xs text-white/70">Teacher Panel</span>
+                  </div>
+                </div>
+                <button onclick="toggleSidebar()" class="lg:hidden text-2xl">✕</button>
+              </div>
+              
+              <div class="bg-white/10 rounded-xl p-4 mb-6">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-full gradient-2 flex items-center justify-center text-xl">
+                    👩‍🏫
+                  </div>
+                  <div>
+                    <p class="font-medium">${currentUser.fullName}</p>
+                    <span class="text-xs bg-white/20 px-2 py-1 rounded-full">ครู</span>
+                  </div>
+                </div>
+              </div>
+              
+              <nav class="space-y-2">
+                <button onclick="setMenu('dashboard')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${currentMenu === 'dashboard' ? 'bg-white/20' : 'hover:bg-white/10'}">
+                  <span class="text-xl">📊</span>
+                  <span>แดชบอร์ด</span>
+                </button>
+                <button onclick="setMenu('profile')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${currentMenu === 'profile' ? 'bg-white/20' : 'hover:bg-white/10'}">
+                  <span class="text-xl">👤</span>
+                  <span>แก้ไขข้อมูลส่วนตัว</span>
+                </button>
+                <button onclick="setMenu('categories')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${currentMenu === 'categories' ? 'bg-white/20' : 'hover:bg-white/10'}">
+                  <span class="text-xl">📁</span>
+                  <span>จัดการประเภทเอกสาร</span>
+                </button>
+                <button onclick="setMenu('documents')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${currentMenu === 'documents' ? 'bg-white/20' : 'hover:bg-white/10'}">
+                  <span class="text-xl">📄</span>
+                  <span>จัดการเอกสาร</span>
+                </button>
+              </nav>
+              
+              <button onclick="logout()" class="w-full mt-8 flex items-center gap-3 px-4 py-3 rounded-xl bg-red-500/80 hover:bg-red-500 transition">
+                <span class="text-xl">🚪</span>
+                <span>ออกจากระบบ</span>
+              </button>
+            </div>
+          </aside>
+          
+          <!-- Main Content -->
+          <main class="flex-1 overflow-auto">
+            <header class="bg-white shadow-sm p-4 flex items-center justify-between sticky top-0 z-30">
+              <button onclick="toggleSidebar()" class="lg:hidden text-2xl text-gray-600">☰</button>
+              <h1 class="text-xl font-bold text-gray-800">
+                ${currentMenu === 'dashboard' ? '📊 แดชบอร์ด' :
+          currentMenu === 'profile' ? '👤 แก้ไขข้อมูลส่วนตัว' :
+            currentMenu === 'categories' ? '📁 จัดการประเภทเอกสาร' : '📄 จัดการเอกสาร'}
+              </h1>
+              <div class="text-sm text-gray-500">${new Date().toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+            </header>
+            
+            <div id="mainContent" class="p-6">
+              ${renderContent()}
+            </div>
+          </main>
+        </div>
+      `;
+    }
+
+    function renderContent() {
+      switch (currentMenu) {
+        case 'dashboard': return renderDashboard();
+        case 'users': return renderUsers();
+        case 'categories': return renderCategories();
+        case 'documents': return renderDocuments();
+        case 'profile': return renderProfile();
+        default: return renderDashboard();
+      }
+    }
+
+    // ==================== Dashboard ====================
+    function renderDashboard() {
+      const documents = getDocuments();
+      const categories = getCategories();
+      const totalDocs = documents.length;
+
+      const gradients = ['gradient-1', 'gradient-2', 'gradient-3', 'gradient-4', 'gradient-5', 'gradient-7'];
+
+      let categoryCards = categories.map((cat, index) => {
+        const count = documents.filter(d => d.categoryId === cat.id).length;
+        const percentage = totalDocs > 0 ? Math.round((count / totalDocs) * 100) : 0;
+        return `
+          <div class="card-decoration ${gradients[index % gradients.length]} rounded-2xl p-6 text-white shadow-lg">
+            <div class="relative z-10">
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-3xl">📁</span>
+                <span class="bg-white/20 px-3 py-1 rounded-full text-sm">${percentage}%</span>
+              </div>
+              <h3 class="text-lg font-medium mb-1">${cat.name}</h3>
+              <p class="text-3xl font-bold">${count}</p>
+              <p class="text-sm text-white/80 mt-1">เอกสาร</p>
+              <div class="mt-4 bg-white/20 rounded-full h-2">
+                <div class="bg-white rounded-full h-2 progress-bar" style="width: ${percentage}%"></div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div class="space-y-6">
+          <!-- Total Documents Card -->
+          <div class="card-decoration gradient-6 rounded-2xl p-8 text-white shadow-xl">
+            <div class="relative z-10 flex items-center justify-between">
+              <div>
+                <h3 class="text-lg font-medium mb-2">📊 จำนวนเอกสารทั้งหมด</h3>
+                <p class="text-5xl font-bold">${totalDocs}</p>
+                <p class="text-white/80 mt-2">เอกสารในระบบ</p>
+              </div>
+              <div class="text-8xl opacity-50">📋</div>
+            </div>
+          </div>
+          
+          <!-- Category Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            ${categoryCards}
+          </div>
+          
+          <!-- Chart Area -->
+          <div class="bg-white rounded-2xl p-6 shadow-lg">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">📈 สถิติเอกสารตามประเภท</h3>
+            <div class="relative">
+              <canvas id="chartCanvas" height="200"></canvas>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // ==================== Users Management ====================
+    function renderUsers() {
+      const users = getUsers();
+
+      return `
+        <div class="space-y-6">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div class="flex items-center gap-2">
+              <span class="bg-[#4A2C6D] text-white px-3 py-1 rounded-full text-sm">ทั้งหมด ${users.length} รายการ</span>
+            </div>
+            <button onclick="showUserModal()" class="gradient-1 text-white px-6 py-3 rounded-xl font-medium hover:opacity-90 transition flex items-center gap-2">
+              <span>➕</span>
+              <span>เพิ่มผู้ใช้งาน</span>
+            </button>
+          </div>
+          
+          <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div class="table-container">
+              <table class="w-full">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">#</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">ชื่อผู้ใช้</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">ชื่อ-นามสกุล</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">บทบาท</th>
+                    <th class="px-6 py-4 text-center text-sm font-semibold text-gray-600">จัดการ</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                  ${users.map((user, index) => `
+                    <tr class="hover:bg-gray-50 transition">
+                      <td class="px-6 py-4 text-gray-600">${index + 1}</td>
+                      <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                          <div class="w-10 h-10 rounded-full ${user.role === 'admin' ? 'gradient-6' : 'gradient-7'} flex items-center justify-center text-white">
+                            ${user.role === 'admin' ? '👨‍💼' : '👩‍🏫'}
+                          </div>
+                          <span class="font-medium text-gray-800">${user.username}</span>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 text-gray-600">${user.fullName}</td>
+                      <td class="px-6 py-4">
+                        <span class="px-3 py-1 rounded-full text-sm ${user.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}">
+                          ${user.role === 'admin' ? '👨‍💼 ผู้ดูแลระบบ' : '👩‍🏫 ครู'}
+                        </span>
+                      </td>
+                      <td class="px-6 py-4">
+                        <div class="flex items-center justify-center gap-2">
+                          <button onclick="showUserModal('${user.id}')" class="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition" title="แก้ไข">
+                            ✏️
+                          </button>
+                          <button onclick="deleteUser('${user.id}')" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition" title="ลบ">
+                            🗑️
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function showUserModal(userId = null) {
+      const users = getUsers();
+      const user = userId ? users.find(u => u.id === userId) : null;
+
+      const modalDiv = document.createElement('div');
+      modalDiv.className = 'fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4';
+      modalDiv.id = 'userModal';
+
+      modalDiv.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md sweet-alert">
+          <div class="p-6 border-b border-gray-100">
+            <h3 class="text-xl font-bold text-gray-800">${user ? '✏️ แก้ไขผู้ใช้งาน' : '➕ เพิ่มผู้ใช้งาน'}</h3>
+          </div>
+          <form id="userForm" class="p-6 space-y-4">
+            <input type="hidden" id="userId" value="${user ? user.id : ''}">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">ชื่อผู้ใช้</label>
+              <input type="text" id="userUsername" value="${user ? user.username : ''}" 
+                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#26A69A] focus:outline-none" placeholder="กรอกชื่อผู้ใช้">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">รหัสผ่าน</label>
+              <input type="password" id="userPassword" value="${user ? user.password : ''}" 
+                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#26A69A] focus:outline-none" placeholder="กรอกรหัสผ่าน">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">ชื่อ-นามสกุล</label>
+              <input type="text" id="userFullName" value="${user ? user.fullName : ''}" 
+                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#26A69A] focus:outline-none" placeholder="กรอกชื่อ-นามสกุล">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">บทบาท</label>
+              <select id="userRole" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#26A69A] focus:outline-none">
+                <option value="admin" ${user && user.role === 'admin' ? 'selected' : ''}>ผู้ดูแลระบบ</option>
+                <option value="teacher" ${user && user.role === 'teacher' ? 'selected' : ''}>ครู</option>
+              </select>
+            </div>
+            <div class="flex gap-3 pt-4">
+              <button type="button" onclick="closeModal('userModal')" class="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-300 transition">
+                ยกเลิก
+              </button>
+              <button type="submit" class="flex-1 px-6 py-3 gradient-1 text-white rounded-xl font-medium hover:opacity-90 transition">
+                ${user ? 'บันทึก' : 'เพิ่ม'}
+              </button>
+            </div>
+          </form>
+        </div>
+      `;
+      document.body.appendChild(modalDiv);
+
+      document.getElementById('userForm').onsubmit = (e) => {
+        e.preventDefault();
+        saveUser();
+      };
+    }
+
+    function saveUser() {
+      const id = document.getElementById('userId').value;
+      const username = document.getElementById('userUsername').value;
+      const password = document.getElementById('userPassword').value;
+      const fullName = document.getElementById('userFullName').value;
+      const role = document.getElementById('userRole').value;
+
+      if (!username || !password || !fullName) {
+        showAlert('warning', 'กรุณากรอกข้อมูล', 'กรุณากรอกข้อมูลให้ครบถ้วน');
+        return;
+      }
+
+      showLoading();
+
+      const userObj = {
+        id: id || null,
+        username,
+        password,
+        fullName,
+        role
+      };
+
+      google.script.run
+        .withSuccessHandler((updatedUsers) => {
+          cachedUsers = updatedUsers;
+          hideLoading();
+          closeModal('userModal');
+          showAlert('success', 'สำเร็จ', id ? 'แก้ไขผู้ใช้งานเรียบร้อยแล้ว' : 'เพิ่มผู้ใช้งานเรียบร้อยแล้ว');
+          render();
+        })
+        .withFailureHandler((err) => {
+          hideLoading();
+          showAlert('error', 'ผิดพลาด', 'บันทึกไม่สำเร็จ: ' + err.message);
+        })
+        .saveUser(userObj);
+    }
+
+    function deleteUser(userId) {
+      showConfirm('ยืนยันการลบ', 'คุณต้องการลบผู้ใช้งานนี้หรือไม่?', () => {
+        showLoading();
+        google.script.run
+          .withSuccessHandler((updatedUsers) => {
+            cachedUsers = updatedUsers;
+            hideLoading();
+            showAlert('success', 'ลบสำเร็จ', 'ลบผู้ใช้งานเรียบร้อยแล้ว');
+            render();
+          })
+          .withFailureHandler((err) => {
+            hideLoading();
+            showAlert('error', 'ผิดพลาด', 'ลบไม่สำเร็จ: ' + err.message);
+          })
+          .deleteUser(userId);
+      });
+    }
+
+    // ==================== Categories Management ====================
+    function renderCategories() {
+      const categories = getCategories();
+
+      return `
+        <div class="space-y-6">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div class="flex items-center gap-2">
+              <span class="bg-[#26A69A] text-white px-3 py-1 rounded-full text-sm">ทั้งหมด ${categories.length} ประเภท</span>
+            </div>
+            <button onclick="showCategoryModal()" class="gradient-1 text-white px-6 py-3 rounded-xl font-medium hover:opacity-90 transition flex items-center gap-2">
+              <span>➕</span>
+              <span>เพิ่มประเภทเอกสาร</span>
+            </button>
+          </div>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            ${categories.map((cat, index) => {
+        const gradients = ['gradient-1', 'gradient-2', 'gradient-3', 'gradient-4', 'gradient-5', 'gradient-7'];
+        return `
+                <div class="card-decoration ${gradients[index % gradients.length]} rounded-2xl p-6 text-white shadow-lg">
+                  <div class="relative z-10">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-3">
+                        <span class="text-3xl">📁</span>
+                        <span class="font-medium text-lg">${cat.name}</span>
+                      </div>
+                      <div class="flex gap-2">
+                        <button onclick="showCategoryModal('${cat.id}')" class="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition">✏️</button>
+                        <button onclick="deleteCategory('${cat.id}')" class="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition">🗑️</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              `;
+      }).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function showCategoryModal(categoryId = null) {
+      const categories = getCategories();
+      const category = categoryId ? categories.find(c => c.id === categoryId) : null;
+
+      const modalDiv = document.createElement('div');
+      modalDiv.className = 'fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4';
+      modalDiv.id = 'categoryModal';
+
+      modalDiv.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md sweet-alert">
+          <div class="p-6 border-b border-gray-100">
+            <h3 class="text-xl font-bold text-gray-800">${category ? '✏️ แก้ไขประเภทเอกสาร' : '➕ เพิ่มประเภทเอกสาร'}</h3>
+          </div>
+          <form id="categoryForm" class="p-6 space-y-4">
+            <input type="hidden" id="categoryId" value="${category ? category.id : ''}">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">ชื่อประเภทเอกสาร</label>
+              <input type="text" id="categoryName" value="${category ? category.name : ''}" 
+                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#26A69A] focus:outline-none" placeholder="กรอกชื่อประเภทเอกสาร">
+            </div>
+            <div class="flex gap-3 pt-4">
+              <button type="button" onclick="closeModal('categoryModal')" class="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-300 transition">
+                ยกเลิก
+              </button>
+              <button type="submit" class="flex-1 px-6 py-3 gradient-1 text-white rounded-xl font-medium hover:opacity-90 transition">
+                ${category ? 'บันทึก' : 'เพิ่ม'}
+              </button>
+            </div>
+          </form>
+        </div>
+      `;
+      document.body.appendChild(modalDiv);
+
+      document.getElementById('categoryForm').onsubmit = (e) => {
+        e.preventDefault();
+        saveCategory();
+      };
+    }
+
+    function saveCategory() {
+      const id = document.getElementById('categoryId').value;
+      const name = document.getElementById('categoryName').value;
+
+      if (!name) {
+        showAlert('warning', 'กรุณากรอกข้อมูล', 'กรุณากรอกชื่อประเภทเอกสาร');
+        return;
+      }
+
+      showLoading();
+
+      const catObj = {
+        id: id || null,
+        name
+      };
+
+      google.script.run
+        .withSuccessHandler((updatedCats) => {
+          cachedCategories = updatedCats;
+          hideLoading();
+          closeModal('categoryModal');
+          showAlert('success', 'สำเร็จ', id ? 'แก้ไขประเภทเอกสารเรียบร้อยแล้ว' : 'เพิ่มประเภทเอกสารเรียบร้อยแล้ว');
+          render();
+        })
+        .withFailureHandler((err) => {
+          hideLoading();
+          showAlert('error', 'ผิดพลาด', 'บันทึกไม่สำเร็จ: ' + err.message);
+        })
+        .saveCategory(catObj);
+    }
+
+    function deleteCategory(categoryId) {
+      showConfirm('ยืนยันการลบ', 'คุณต้องการลบประเภทเอกสารนี้หรือไม่?', () => {
+        showLoading();
+        google.script.run
+          .withSuccessHandler((updatedCats) => {
+            cachedCategories = updatedCats;
+            hideLoading();
+            showAlert('success', 'ลบสำเร็จ', 'ลบประเภทเอกสารเรียบร้อยแล้ว');
+            render();
+          })
+          .withFailureHandler((err) => {
+            hideLoading();
+            showAlert('error', 'ผิดพลาด', 'ลบไม่สำเร็จ: ' + err.message);
+          })
+          .deleteCategory(categoryId);
+      });
+    }
+
+    // ==================== Documents Management ====================
+    let docCurrentPage = 1;
+    let docPerPage = 10;
+    let docSortField = 'docNumber';
+    let docSortOrder = 'asc';
+    let docSearchTerm = '';
+    let docCategoryFilter = ''; // New: Category Filter
+    let searchTimeout = null;   // New: Debounce Timeout
+
+    function renderDocuments() {
+      const documents = getDocuments();
+      const categories = getCategories();
+
+      let filteredDocs = documents.filter(doc => {
+        // Filter by Search Term
+        const matchTerm = !docSearchTerm ||
+          (doc.docNumber && doc.docNumber.toLowerCase().includes(docSearchTerm.toLowerCase())) ||
+          (doc.subject && doc.subject.toLowerCase().includes(docSearchTerm.toLowerCase()));
+
+        // Filter by Category
+        const matchCategory = !docCategoryFilter || doc.categoryId === docCategoryFilter;
+
+        return matchTerm && matchCategory;
+      });
+
+      // Filter by owner for teachers
+      if (currentUser.role === 'teacher') {
+        // Show all documents but will restrict edit/delete
+      }
+
+      // Sort
+      filteredDocs.sort((a, b) => {
+        let aVal = a[docSortField] || '';
+        let bVal = b[docSortField] || '';
+        if (docSortOrder === 'asc') {
+          return aVal.localeCompare(bVal);
+        } else {
+          return bVal.localeCompare(aVal);
+        }
+      });
+
+      // Pagination
+      const totalPages = Math.ceil(filteredDocs.length / docPerPage);
+      const startIndex = (docCurrentPage - 1) * docPerPage;
+      const paginatedDocs = filteredDocs.slice(startIndex, startIndex + docPerPage);
+
+      return `
+        <div class="space-y-6">
+          <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="bg-[#26A69A] text-white px-3 py-1 rounded-full text-sm">ทั้งหมด ${filteredDocs.length} รายการ</span>
+              
+              <!-- Category Filter -->
+              <select id="docCategoryFilterSelect" 
+                  class="px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-[#26A69A] focus:outline-none bg-white">
+                  <option value="">ทั้งหมด</option>
+                  ${categories.map(c => `<option value="${c.id}" ${docCategoryFilter === c.id ? 'selected' : ''}>${c.name}</option>`).join('')}
+              </select>
+
+              <!-- Search -->
+              <div class="flex items-center gap-2">
+                <input type="text" id="docSearch" placeholder="🔍 ค้นหาเอกสาร..." value="${docSearchTerm}"
+                  class="px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-[#26A69A] focus:outline-none">
+                
+                <button onclick="performSearch()" class="gradient-1 text-white px-4 py-2 rounded-xl font-medium hover:opacity-90 transition shadow-md">
+                  ค้นหา
+                </button>
+              </div>
+            </div>
+            <button onclick="showDocumentModal()" class="gradient-1 text-white px-6 py-3 rounded-xl font-medium hover:opacity-90 transition flex items-center gap-2">
+              <span>➕</span>
+              <span>เพิ่มเอกสาร</span>
+            </button>
+          </div>
+          
+          <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div class="table-container">
+              <table class="w-full">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 cursor-pointer hover:bg-gray-100" onclick="sortDocuments('docNumber')">
+                      เลขที่หนังสือ ${docSortField === 'docNumber' ? (docSortOrder === 'asc' ? '↑' : '↓') : ''}
+                    </th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 cursor-pointer hover:bg-gray-100" onclick="sortDocuments('subject')">
+                      เรื่อง ${docSortField === 'subject' ? (docSortOrder === 'asc' ? '↑' : '↓') : ''}
+                    </th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">ประเภท</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 cursor-pointer hover:bg-gray-100" onclick="sortDocuments('fiscalYear')">
+                      ปีงบประมาณ ${docSortField === 'fiscalYear' ? (docSortOrder === 'asc' ? '↑' : '↓') : ''}
+                    </th>
+                    <th class="px-6 py-4 text-center text-sm font-semibold text-gray-600">จัดการ</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                  ${paginatedDocs.length === 0 ? `
+                    <tr>
+                      <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                        <div class="text-5xl mb-4">📭</div>
+                        <p>ไม่พบข้อมูลเอกสาร</p>
+                      </td>
+                    </tr>
+                  ` : paginatedDocs.map(doc => {
+        const category = categories.find(c => c.id === doc.categoryId);
+        const canEdit = currentUser.role === 'admin' || doc.ownerId === currentUser.id;
+
+        // Determine badge color
+        const gradients = ['gradient-1', 'gradient-2', 'gradient-3', 'gradient-4', 'gradient-5', 'gradient-7'];
+        let badgeClass = 'bg-blue-100 text-blue-700'; // Default fallback
+        if (category) {
+          const catIndex = categories.findIndex(c => c.id === category.id);
+          if (catIndex !== -1) {
+            // Use the gradient background, and make text white for readability
+            badgeClass = `${gradients[catIndex % gradients.length]} text-white`;
+          }
+        }
+
+        return `
+                      <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-4">
+                          <span class="font-medium text-gray-800">${doc.docNumber || '-'}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                          <div class="max-w-xs truncate text-gray-600" title="${doc.subject || ''}">${doc.subject || '-'}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                          <span class="px-3 py-1 ${badgeClass} rounded-full text-sm">
+                            ${category ? category.name : '-'}
+                          </span>
+                        </td>
+                        <td class="px-6 py-4 text-gray-600">${doc.fiscalYear || '-'}</td>
+                        <td class="px-6 py-4">
+                          <div class="flex items-center justify-center gap-2">
+                            <button onclick="showDocumentDetail('${doc.id}')" class="p-2 text-green-500 hover:bg-green-50 rounded-lg transition" title="ดูรายละเอียด">
+                              👁️
+                            </button>
+                            ${canEdit ? `
+                              <button onclick="showDocumentModal('${doc.id}')" class="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition" title="แก้ไข">
+                                ✏️
+                              </button>
+                              <button onclick="deleteDocument('${doc.id}')" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition" title="ลบ">
+                                🗑️
+                              </button>
+                            ` : ''}
+                          </div>
+                        </td>
+                      </tr>
+                    `;
+      }).join('')}
+                </tbody>
+              </table>
+            </div>
+            
+            <!-- Pagination -->
+            ${totalPages > 1 ? `
+              <div class="px-6 py-4 bg-gray-50 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <span class="text-sm text-gray-600">แสดง ${startIndex + 1} - ${Math.min(startIndex + docPerPage, filteredDocs.length)} จาก ${filteredDocs.length} รายการ</span>
+                <div class="flex items-center gap-2">
+                  <button onclick="goToPage(${docCurrentPage - 1})" ${docCurrentPage === 1 ? 'disabled' : ''} 
+                    class="px-4 py-2 rounded-lg ${docCurrentPage === 1 ? 'bg-gray-100 text-gray-400' : 'bg-white border border-gray-200 hover:bg-gray-50'} transition">
+                    ◀️
+                  </button>
+                  ${Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+        let page;
+        if (totalPages <= 5) {
+          page = i + 1;
+        } else if (docCurrentPage <= 3) {
+          page = i + 1;
+        } else if (docCurrentPage >= totalPages - 2) {
+          page = totalPages - 4 + i;
+        } else {
+          page = docCurrentPage - 2 + i;
+        }
+        return `
+                      <button onclick="goToPage(${page})" 
+                        class="px-4 py-2 rounded-lg ${docCurrentPage === page ? 'gradient-1 text-white' : 'bg-white border border-gray-200 hover:bg-gray-50'} transition">
+                        ${page}
+                      </button>
+                    `;
+      }).join('')}
+                  <button onclick="goToPage(${docCurrentPage + 1})" ${docCurrentPage === totalPages ? 'disabled' : ''} 
+                    class="px-4 py-2 rounded-lg ${docCurrentPage === totalPages ? 'bg-gray-100 text-gray-400' : 'bg-white border border-gray-200 hover:bg-gray-50'} transition">
+                    ▶️
+                  </button>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    function performSearch() {
+      // Read values directly from inputs
+      const term = document.getElementById('docSearch').value;
+      const categoryId = document.getElementById('docCategoryFilterSelect').value;
+
+      // Update state
+      docSearchTerm = term;
+      docCategoryFilter = categoryId;
+      docCurrentPage = 1;
+
+      // Render
+      document.getElementById('mainContent').innerHTML = renderDocuments();
+    }
+
+    // Unused legacy functions removed
+    function debouncedSearch(term) { }
+    function filterDocuments(categoryId) { }
+    function searchDocuments(term) { }
+
+    function sortDocuments(field) {
+      if (docSortField === field) {
+        docSortOrder = docSortOrder === 'asc' ? 'desc' : 'asc';
+      } else {
+        docSortField = field;
+        docSortOrder = 'asc';
+      }
+      document.getElementById('mainContent').innerHTML = renderDocuments();
+    }
+
+    function goToPage(page) {
+      const documents = getDocuments();
+      const totalPages = Math.ceil(documents.length / docPerPage);
+      if (page >= 1 && page <= totalPages) {
+        docCurrentPage = page;
+        document.getElementById('mainContent').innerHTML = renderDocuments();
+      }
+    }
+
+    let uploadedFiles = [];
+
+    function showDocumentModal(docId = null) {
+      const documents = getDocuments();
+      const categories = getCategories();
+      const doc = docId ? documents.find(d => d.id === docId) : null;
+      uploadedFiles = doc ? (doc.files || []) : [];
+
+      const modalDiv = document.createElement('div');
+      modalDiv.className = 'fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 overflow-auto';
+      modalDiv.id = 'documentModal';
+
+      modalDiv.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl my-4 sweet-alert">
+          <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+            <h3 class="text-xl font-bold text-gray-800">${doc ? '✏️ แก้ไขเอกสาร' : '➕ เพิ่มเอกสาร'}</h3>
+            <button onclick="closeModal('documentModal')" class="text-gray-400 hover:text-gray-600 text-2xl">✕</button>
+          </div>
+          <form id="documentForm" class="p-6 space-y-4 max-h-[70vh] overflow-auto">
+            <input type="hidden" id="docId" value="${doc ? doc.id : ''}">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">เลขที่หนังสือ</label>
+                <input type="text" id="docNumber" value="${doc ? doc.docNumber || '' : ''}" 
+                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#26A69A] focus:outline-none" placeholder="กรอกเลขที่หนังสือ">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">ประเภทเอกสาร</label>
+                <select id="docCategory" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#26A69A] focus:outline-none">
+                  <option value="">-- เลือกประเภท --</option>
+                  ${categories.map(cat => `
+                    <option value="${cat.id}" ${doc && doc.categoryId === cat.id ? 'selected' : ''}>${cat.name}</option>
+                  `).join('')}
+                </select>
+              </div>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">เรื่อง</label>
+              <input type="text" id="docSubject" value="${doc ? doc.subject || '' : ''}" 
+                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#26A69A] focus:outline-none" placeholder="กรอกเรื่อง">
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">หน่วยงานต้นเรื่อง</label>
+                <input type="text" id="docDepartment" value="${doc ? doc.department || '' : ''}" 
+                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#26A69A] focus:outline-none" placeholder="กรอกหน่วยงาน">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">วันที่ออกเอกสาร</label>
+                <input type="date" id="docDate" value="${doc ? doc.docDate || '' : ''}" 
+                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#26A69A] focus:outline-none">
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">ปีงบประมาณ</label>
+                <input type="text" id="docFiscalYear" value="${doc ? doc.fiscalYear || '' : ''}" 
+                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#26A69A] focus:outline-none" placeholder="เช่น 2567">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">ผู้รับผิดชอบ</label>
+                <input type="text" id="docResponsible" value="${doc ? doc.responsible || '' : ''}" 
+                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#26A69A] focus:outline-none" placeholder="กรอกชื่อผู้รับผิดชอบ">
+              </div>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">📎 ไฟล์แนบ</label>
+              <div id="dropZone" class="file-drop-zone rounded-xl p-8 text-center cursor-pointer" onclick="document.getElementById('fileInput').click()">
+                <div class="text-4xl mb-2">📁</div>
+                <p class="text-gray-600">คลิกหรือลากไฟล์มาวางที่นี่</p>
+                <p class="text-sm text-gray-400 mt-1">รองรับ: รูปภาพ, PDF, Word, Excel, PowerPoint</p>
+              </div>
+              <input type="file" id="fileInput" multiple accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" class="hidden" onchange="handleFileSelect(event)">
+              
+              <div id="fileList" class="mt-4 space-y-2">
+                ${uploadedFiles.map((file, index) => `
+                  <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                    <div class="flex items-center gap-2">
+                      <span>${getFileIcon(file.name)}</span>
+                      <span class="text-sm text-gray-700 truncate max-w-xs">${file.name}</span>
+                    </div>
+                    <button type="button" onclick="removeFile(${index})" class="text-red-500 hover:text-red-700">🗑️</button>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+            
+            <div class="flex gap-3 pt-4">
+              <button type="button" onclick="closeModal('documentModal')" class="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-300 transition">
+                ยกเลิก
+              </button>
+              <button type="submit" class="flex-1 px-6 py-3 gradient-1 text-white rounded-xl font-medium hover:opacity-90 transition">
+                ${doc ? 'บันทึก' : 'เพิ่ม'}
+              </button>
+            </div>
+          </form>
+        </div>
+      `;
+      document.body.appendChild(modalDiv);
+
+      // Setup drag and drop
+      const dropZone = document.getElementById('dropZone');
+
+      dropZone.ondragover = (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+      };
+
+      dropZone.ondragleave = () => {
+        dropZone.classList.remove('dragover');
+      };
+
+      dropZone.ondrop = (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        handleFiles(e.dataTransfer.files);
+      };
+
+      document.getElementById('documentForm').onsubmit = (e) => {
+        e.preventDefault();
+        saveDocument();
+      };
+    }
+
+    function getFileIcon(filename) {
+      const ext = filename.split('.').pop().toLowerCase();
+      const icons = {
+        'pdf': '📕',
+        'doc': '📘', 'docx': '📘',
+        'xls': '📗', 'xlsx': '📗',
+        'ppt': '📙', 'pptx': '📙',
+        'jpg': '🖼️', 'jpeg': '🖼️', 'png': '🖼️', 'gif': '🖼️'
+      };
+      return icons[ext] || '📄';
+    }
+
+    function handleFileSelect(event) {
+      handleFiles(event.target.files);
+    }
+
+    function handleFiles(files) {
+      for (let file of files) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          uploadedFiles.push({
+            name: file.name,
+            type: file.type,
+            data: e.target.result
+          });
+          updateFileList();
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function updateFileList() {
+      const fileList = document.getElementById('fileList');
+      fileList.innerHTML = uploadedFiles.map((file, index) => `
+        <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+          <div class="flex items-center gap-2">
+            <span>${getFileIcon(file.name)}</span>
+            <span class="text-sm text-gray-700 truncate max-w-xs">${file.name}</span>
+          </div>
+          <button type="button" onclick="removeFile(${index})" class="text-red-500 hover:text-red-700">🗑️</button>
+        </div>
+      `).join('');
+    }
+
+    function removeFile(index) {
+      uploadedFiles.splice(index, 1);
+      updateFileList();
+    }
+
+    function saveDocument() {
+      const id = document.getElementById('docId').value;
+      const docNumber = document.getElementById('docNumber').value;
+      const categoryId = document.getElementById('docCategory').value;
+      const subject = document.getElementById('docSubject').value;
+      const department = document.getElementById('docDepartment').value;
+      const docDate = document.getElementById('docDate').value;
+      const fiscalYear = document.getElementById('docFiscalYear').value;
+      const responsible = document.getElementById('docResponsible').value;
+
+      showLoading();
+
+      // Separate doc metadata from file data for the server function
+      const docData = {
+        id: id || null,
+        docNumber,
+        categoryId,
+        subject,
+        department,
+        docDate,
+        fiscalYear,
+        responsible,
+        ownerId: currentUser ? currentUser.id : null,
+        ownerName: currentUser ? currentUser.fullName : null
+      };
+
+      // uploadedFiles contains {name, type, data, id?}.
+      // Server expects this array as second argument.
+      const filesData = uploadedFiles;
+
+      google.script.run
+        .withSuccessHandler((updatedDocs) => {
+          cachedDocuments = updatedDocs;
+          hideLoading();
+          closeModal('documentModal');
+          showAlert('success', 'สำเร็จ', id ? 'แก้ไขเอกสารเรียบร้อยแล้ว' : 'เพิ่มเอกสารเรียบร้อยแล้ว');
+          render();
+        })
+        .withFailureHandler((err) => {
+          hideLoading();
+          showAlert('error', 'ผิดพลาด', 'บันทึกไม่สำเร็จ: ' + err.message);
+        })
+        .saveDocument(docData, filesData);
+    }
+
+    function showDocumentDetail(docId) {
+      const documents = getDocuments();
+      const categories = getCategories();
+      const doc = documents.find(d => d.id === docId);
+      const category = categories.find(c => c.id === doc.categoryId);
+
+      const modalDiv = document.createElement('div');
+      modalDiv.className = 'fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 overflow-auto';
+      modalDiv.id = 'detailModal';
+
+      modalDiv.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl my-4 sweet-alert">
+          <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+            <h3 class="text-xl font-bold text-gray-800">📄 รายละเอียดเอกสาร</h3>
+            <button onclick="closeModal('detailModal')" class="text-gray-400 hover:text-gray-600 text-2xl">✕</button>
+          </div>
+          <div class="p-6 space-y-4 max-h-[70vh] overflow-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-gray-50 p-4 rounded-xl">
+                <span class="text-sm text-gray-500">เลขที่หนังสือ</span>
+                <p class="font-medium text-gray-800">${doc.docNumber || '-'}</p>
+              </div>
+              <div class="bg-gray-50 p-4 rounded-xl">
+                <span class="text-sm text-gray-500">ประเภทเอกสาร</span>
+                <p class="font-medium text-gray-800">${category ? category.name : '-'}</p>
+              </div>
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded-xl">
+              <span class="text-sm text-gray-500">เรื่อง</span>
+              <p class="font-medium text-gray-800">${doc.subject || '-'}</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-gray-50 p-4 rounded-xl">
+                <span class="text-sm text-gray-500">หน่วยงานต้นเรื่อง</span>
+                <p class="font-medium text-gray-800">${doc.department || '-'}</p>
+              </div>
+              <div class="bg-gray-50 p-4 rounded-xl">
+                <span class="text-sm text-gray-500">วันที่ออกเอกสาร</span>
+                <p class="font-medium text-gray-800">${doc.docDate ? new Date(doc.docDate).toLocaleDateString('th-TH') : '-'}</p>
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-gray-50 p-4 rounded-xl">
+                <span class="text-sm text-gray-500">ปีงบประมาณ</span>
+                <p class="font-medium text-gray-800">${doc.fiscalYear || '-'}</p>
+              </div>
+              <div class="bg-gray-50 p-4 rounded-xl">
+                <span class="text-sm text-gray-500">ผู้รับผิดชอบ</span>
+                <p class="font-medium text-gray-800">${doc.responsible || '-'}</p>
+              </div>
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded-xl">
+              <span class="text-sm text-gray-500">ผู้บันทึก</span>
+              <p class="font-medium text-gray-800">${doc.ownerName || '-'}</p>
+            </div>
+            
+            ${doc.files && doc.files.length > 0 ? `
+              <div class="bg-gray-50 p-4 rounded-xl">
+                <span class="text-sm text-gray-500 block mb-3">📎 ไฟล์แนบ (${doc.files.length} ไฟล์)</span>
+                <div class="space-y-2">
+                  ${doc.files.map(file => `
+                    <div class="flex items-center justify-between bg-white p-3 rounded-lg shadow-sm">
+                      <div class="flex items-center gap-2">
+                        <span>${getFileIcon(file.name)}</span>
+                        <span class="text-sm text-gray-700 truncate max-w-xs">${file.name}</span>
+                      </div>
+                      <a href="${file.url || file.data}" target="_blank" download="${file.name}" class="text-blue-500 hover:text-blue-700 text-sm">⬇️ ดาวน์โหลด</a>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+            
+            <div class="pt-4">
+              <button onclick="closeModal('detailModal')" class="w-full px-6 py-3 gradient-1 text-white rounded-xl font-medium hover:opacity-90 transition">
+                ปิด
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modalDiv);
+    }
+
+    function deleteDocument(docId) {
+      showConfirm('ยืนยันการลบ', 'คุณต้องการลบเอกสารนี้หรือไม่?', () => {
+        showLoading();
+        google.script.run
+          .withSuccessHandler((updatedDocs) => {
+            cachedDocuments = updatedDocs;
+            hideLoading();
+            showAlert('success', 'ลบสำเร็จ', 'ลบเอกสารเรียบร้อยแล้ว');
+            render();
+          })
+          .withFailureHandler((err) => {
+            hideLoading();
+            showAlert('error', 'ผิดพลาด', 'ลบเอกสารไม่สำเร็จ: ' + err.message);
+          })
+          .deleteDocument(docId);
+      });
+    }
+
+    // ==================== Profile (Teacher) ====================
+    function renderProfile() {
+      return `
+        <div class="max-w-xl mx-auto">
+          <div class="bg-white rounded-2xl shadow-lg p-8">
+            <div class="text-center mb-8">
+              <div class="w-24 h-24 rounded-full gradient-7 flex items-center justify-center text-5xl mx-auto mb-4">
+                👩‍🏫
+              </div>
+              <h2 class="text-2xl font-bold text-gray-800">${currentUser.fullName}</h2>
+              <span class="inline-block mt-2 px-4 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">ครู</span>
+            </div>
+            
+            <form id="profileForm" class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">ชื่อผู้ใช้</label>
+                <input type="text" id="profileUsername" value="${currentUser.username}" 
+                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#26A69A] focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">รหัสผ่าน</label>
+                <input type="password" id="profilePassword" value="${currentUser.password}" 
+                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#26A69A] focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">ชื่อ-นามสกุล</label>
+                <input type="text" id="profileFullName" value="${currentUser.fullName}" 
+                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#26A69A] focus:outline-none">
+              </div>
+              <button type="submit" class="w-full px-6 py-3 gradient-1 text-white rounded-xl font-medium hover:opacity-90 transition mt-6">
+                💾 บันทึกข้อมูล
+              </button>
+            </form>
+          </div>
+        </div>
+      `;
+    }
+
+    // ==================== Utility Functions ====================
+    function toggleSidebar() {
+      sidebarOpen = !sidebarOpen;
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+
+      if (sidebarOpen) {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+      }
+    }
+
+    function setMenu(menu) {
+      currentMenu = menu;
+      sidebarOpen = false;
+      render();
+    }
+
+    function closeModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) modal.remove();
+    }
+
+    function logout() {
+      showConfirm('ออกจากระบบ', 'คุณต้องการออกจากระบบหรือไม่?', () => {
+        currentUser = null;
+        currentPage = 'login';
+        currentMenu = 'dashboard';
+        render();
+      });
+    }
+
+    // ==================== Initialize ====================
+    initApp();
+
+    // Profile form submission
+    document.addEventListener('submit', function (e) {
+      if (e.target.id === 'profileForm') {
+        e.preventDefault();
+
+        const username = document.getElementById('profileUsername').value;
+        const password = document.getElementById('profilePassword').value;
+        const fullName = document.getElementById('profileFullName').value;
+
+        if (!username || !password || !fullName) {
+          showAlert('warning', 'กรุณากรอกข้อมูล', 'กรุณากรอกข้อมูลให้ครบถ้วน');
+          return;
+        }
+
+        showLoading();
+
+        const userObj = {
+          id: currentUser.id,
+          username,
+          password,
+          fullName,
+          role: currentUser.role
+        };
+
+        google.script.run
+          .withSuccessHandler((updatedUsers) => {
+            cachedUsers = updatedUsers;
+            // Update current user references
+            currentUser = updatedUsers.find(u => u.id === currentUser.id);
+            hideLoading();
+            showAlert('success', 'สำเร็จ', 'บันทึกข้อมูลเรียบร้อยแล้ว');
+            render();
+          })
+          .withFailureHandler((err) => {
+            hideLoading();
+            showAlert('error', 'ผิดพลาด', 'บันทึกไม่สำเร็จ: ' + err.message);
+          })
+          .saveUser(userObj);
+      }
+    });
+  </script>
+
+</body>
+
+</html>
